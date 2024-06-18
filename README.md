@@ -1,2 +1,2 @@
 # Amritanshu_Tech
-My Personal Reposistory of my Projects
+My Personal Repository of my Projects
