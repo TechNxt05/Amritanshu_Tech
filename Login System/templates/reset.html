@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='OTP.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Reset Password</h1>
+        <form action="{{ url_for('reset_page') }}" method="POST">
+            <div class="input__box">
+                <span class="details">New Password:</span>
+                <input type="password" name="new_password" placeholder="Enter new password" required>
+            </div>
+            <div class="button">
+                <input type="submit" value="Reset Password">
+            </div>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>
