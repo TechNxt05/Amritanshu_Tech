@@ -1,0 +1,12 @@
+body{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+    justify-content: center;
+}
+
+.container{
+    background-image: linear-gradient(135deg, red, rgb(45, 8, 231));
+    width : 200px;
+    height : 400px;
+}
