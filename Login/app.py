@@ -1,3 +1,4 @@
+from cryptography.fernet import Fernet
 from flask import Flask, render_template, request, redirect, flash, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
@@ -15,6 +16,20 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'amritanshu05yadav@gmail.com'
 app.config['MAIL_PASSWORD'] = 'izfp obyx bjrr xeys'
+
+# Generate a key for encryption/decryption
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
+
+# Function to encrypt a password
+def encrypt_password(password):
+    encrypted_password = cipher_suite.encrypt(password.encode()).decode()
+    return encrypted_password
+
+# Function to decrypt a password
+def decrypt_password(encrypted_password):
+    decrypted_password = cipher_suite.decrypt(encrypted_password.encode()).decode()
+    return decrypted_password
 
 mail = Mail(app)
 db = SQLAlchemy(app)
@@ -67,7 +82,9 @@ def register():
         city = request.form['city']
         nationality = request.form['nationality']
 
-        log = Login(uname=uname, pass1=passw, mainpass=passw)
+        encrypted_password = encrypt_password(passw)
+
+        log = Login(uname=uname, pass1=encrypted_password, mainpass=encrypted_password)
         db.session.add(log)
         db.session.commit()
 
@@ -85,7 +102,7 @@ def register():
         db.session.add(user_details)
         db.session.commit()
 
-        flash('User created successfully!', category='success')
+        flash('Registered successfully!', category='success')
         return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -106,11 +123,13 @@ def login():
             flash('Username does not exist', 'error')
         else:
             password_age = datetime.utcnow() - user.date
+            decrypted_password = decrypt_password(user.mainpass)
+
             if password_age.days > 60:
                 user.mainpass = ''
                 db.session.commit()
                 flash('Your Password has expired. Reset Your Password by going to "Forgot Password"', 'error')
-            elif user.mainpass != password:
+            elif decrypted_password != password:
                 flash('Wrong password', 'error')
             else:
                 flash('Login successful', 'success')
@@ -131,7 +150,7 @@ def otp_page():
         session['otp'] = otp
         session['email'] = email
         
-        msg = Message('Your OTP Code', sender='your_email@gmail.com', recipients=[email])
+        msg = Message('Your OTP Code', sender='amritanshu05yadav@gmail.com', recipients=[email])
         msg.body = f'Your OTP code is {otp}'
         mail.send(msg)
         
@@ -160,15 +179,18 @@ def reset_page():
         if user_details:
             user = Login.query.get(user_details.user_id)
 
+            # Encrypt the new password
+            encrypted_new_password = encrypt_password(new_password)
+
             # Check if the new password is the same as any of the previous passwords
-            if new_password in [user.mainpass, user.pass1, user.pass2, user.pass3]:
+            if encrypted_new_password in [user.mainpass, user.pass1, user.pass2, user.pass3]:
                 flash('New password cannot be the same as any of the previous passwords.', 'error')
             else:
                 # Shift passwords and update with the new one
                 user.pass3 = user.pass2
                 user.pass2 = user.pass1
-                user.pass1 = new_password
-                user.mainpass = new_password
+                user.pass1 = encrypted_new_password
+                user.mainpass = encrypted_new_password
                 user.date = datetime.utcnow()
                 
                 db.session.commit()
