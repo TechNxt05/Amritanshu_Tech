@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign-In</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+    <div class="container" style="margin-top: 100px; padding-bottom: 10px; margin-bottom: 160px; width: 500px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <form action="/signin" method="POST"> <!-- Changed action to '/signin' -->
+            <div class="title" style="text-align: center;">Login</div>
+            <div class="user__details2">
+                <div class="input__box">
+                    <span class="details">Username</span>
+                    <input type="text" name="username" placeholder="Username" required>
+                </div>
+                <div class="input__box">
+                    <span class="details">Password</span>
+                    <input type="password" name="password" placeholder="Password" id="password" required>
+                </div>
+            </div>
+            <div class="button" style="margin-bottom: 5px;">
+                <input type="submit" value="Login">
+            </div>
+            <div style="text-align: right;"><a href="{{ url_for('otp_page') }}" style="text-decoration: none;">Forgot Password</a></div>
+            <div style="margin-top: 20px;"><a href="{{ url_for('register') }}" style="text-decoration: none;">Haven't registered?</a></div>
+        </form>
+    </div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+</body>
+</html>
