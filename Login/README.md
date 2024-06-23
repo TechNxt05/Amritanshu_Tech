@@ -18,7 +18,7 @@ Note : For better security, Passwords are stored in encrypted form and passwords
 # Usage :
 1.	Open the Terminal in a new Folder and clone this repository to your local machine.
 2.	Setup a virtual environment and install the required dependencies using pip install -r requirements.txt.
-3.	Run the project using python GUI.py.
+3.	Run the project using python app.py.
 
 # Description :
 1.	Flask application app.py for back-end.
