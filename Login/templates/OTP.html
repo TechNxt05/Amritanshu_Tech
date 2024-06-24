@@ -9,6 +9,17 @@
 <body>
     <form action="{{ url_for('otp_page') }}" method="POST" id="container">
         <h1>OTP Verification</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
         <div class="input__box">
             <span class="details">Enter your email:</span>
             <input type="text" name="email" placeholder="E-mail ID" required>

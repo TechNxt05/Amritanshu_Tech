@@ -5,17 +5,35 @@ from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 import random
 import string
+import os
+import sqlite3
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///login_details.db"
 app.secret_key = 'your_secret_key'
 
+DB_PATH = os.path.abspath('C:/Users/Amritanshu/OneDrive/Desktop/Projects/Login System/props.db')
+
+def get_mail_config():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT Value FROM Property WHERE Key = ? AND isActive = 1', ('mail_username',))
+    mail_username = cursor.fetchone()[0]
+    cursor.execute('SELECT Value FROM Property WHERE Key = ? AND isActive = 1', ('mail_password',))
+    mail_password = cursor.fetchone()[0]
+    conn.close()
+    return mail_username, mail_password
+
+mail_username, mail_password = get_mail_config()
+print(mail_username)
+print(mail_password)
+
 # Configuration for Flask-Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'amritanshu05yadav@gmail.com'
-app.config['MAIL_PASSWORD'] = 'izfp obyx bjrr xeys'
+app.config['MAIL_USERNAME'] = mail_username
+app.config['MAIL_PASSWORD'] = mail_password
 
 # Generate a key for encryption/decryption
 key = Fernet.generate_key()
@@ -33,6 +51,8 @@ def decrypt_password(encrypted_password):
 
 mail = Mail(app)
 db = SQLAlchemy(app)
+
+
 
 class Login(db.Model):
     uno = db.Column(db.Integer, primary_key=True)
@@ -60,6 +80,27 @@ class UserDetails(db.Model):
 
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
+
+def get_file_path(key):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT VALUE FROM Property WHERE KEY = ? AND isActive = 1', (key,))
+    result = cursor.fetchone()
+    conn.close()
+    if result:
+        return result[0]
+    else:
+        raise FileNotFoundError(f"File path for key '{key}' not found or is inactive.")
+
+def path_check():
+    keys_to_fetch = ['login', 'signin', 'verify_otp']  # Example keys you want to fetch
+
+    for key in keys_to_fetch:
+        try:
+            file_path = get_file_path(key)
+            print(f"File path for key '{key}': {file_path}")
+        except FileNotFoundError as e:
+            print(e)
 
 @app.route('/', methods=["GET", "POST"])
 def register():
@@ -105,7 +146,7 @@ def register():
         flash('Registered successfully!', category='success')
         return redirect(url_for('login'))
 
-    return render_template('login.html')
+    return render_template(get_file_path('login'))
 
 @app.route('/signin', methods=["GET", "POST"])
 def login():
@@ -135,28 +176,34 @@ def login():
                 flash('Login successful', 'success')
                 return redirect(url_for('home_page'))  # Redirect to home page upon successful login
 
-    return render_template('signin.html')
-
+    return render_template(get_file_path('signin'))
 
 @app.route('/home')
 def home_page():
-    return render_template('home.html')
+    return render_template(get_file_path('home'))
 
 @app.route('/otp', methods=["GET", "POST"])
 def otp_page():
     if request.method == "POST":
         email = request.form.get('email')
-        otp = generate_otp()
-        session['otp'] = otp
-        session['email'] = email
-        
-        msg = Message('Your OTP Code', sender='amritanshu05yadav@gmail.com', recipients=[email])
-        msg.body = f'Your OTP code is {otp}'
-        mail.send(msg)
-        
-        flash('OTP sent to your email address', 'info')
-        return redirect(url_for('verify_otp'))
-    return render_template('OTP.html')
+
+        # Check if the email exists in UserDetails table
+        user_details = UserDetails.query.filter_by(email=email).first()
+
+        if user_details:
+            otp = generate_otp()
+            session['otp'] = otp
+            session['email'] = email
+            
+            msg = Message('Your OTP Code', sender='amritanshu05yadav@gmail.com', recipients=[email])
+            msg.body = f'Your OTP code is {otp}'
+            mail.send(msg)
+            
+            flash('OTP sent to your email address', 'info')
+            return redirect(url_for('verify_otp'))
+        else:
+            flash('Email not found in our records', 'error')
+    return render_template(get_file_path('OTP'))
 
 @app.route('/verify_otp', methods=["GET", "POST"])
 def verify_otp():
@@ -166,7 +213,7 @@ def verify_otp():
             return redirect(url_for('reset_page'))
         else:
             flash('Wrong OTP', 'error')
-    return render_template('verify_otp.html')
+    return render_template(get_file_path('verify_otp'))
 
 @app.route('/reset', methods=["GET", "POST"])
 def reset_page():
@@ -199,12 +246,11 @@ def reset_page():
         else:
             flash('User not found.', 'error')
 
-    return render_template('reset.html')
-
-
+    return render_template(get_file_path('reset'))
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     print("Starting Flask app...")
+    path_check()
     app.run(debug=False, port=9000)
