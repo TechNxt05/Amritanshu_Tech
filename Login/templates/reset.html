@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='OTP.css') }}">
+    
 </head>
 <body>
     <div class="container">
@@ -12,7 +13,29 @@
         <form action="{{ url_for('reset_page') }}" method="POST">
             <div class="input__box">
                 <span class="details">New Password:</span>
-                <input type="password" name="new_password" placeholder="Enter new password" required>
+                <input type="password" name="new_password" id="new_password" placeholder="Enter new password" required oninput="textChange()">
+                <div class="validator">
+                    <p id="capital">
+                        <i class="fas fa-times"></i>
+                        <i class="fas fa-check"></i>
+                        <span>Upper Case</span>
+                    </p>
+                    <p id="special-char">
+                        <i class="fas fa-times"></i>
+                        <i class="fas fa-check"></i>
+                        <span>Special Character</span>
+                    </p>
+                    <p id="number">
+                        <i class="fas fa-times"></i>
+                        <i class="fas fa-check"></i>
+                        <span>Number</span>
+                    </p>
+                    <p id="more-than-8">
+                        <i class="fas fa-times"></i>
+                        <i class="fas fa-check"></i>
+                        <span>More than 8 characters</span>
+                    </p>
+                </div>
             </div>
             <div class="button">
                 <input type="submit" value="Reset Password">
@@ -28,5 +51,8 @@
             {% endif %}
         {% endwith %}
     </div>
+    <script src="{{ url_for('static', filename='login2.js') }}"></script>
+    <script src='https://kit.fontawesome.com/1c2c2462bf.js'></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </body>
 </html>

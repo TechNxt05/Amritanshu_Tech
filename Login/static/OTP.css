@@ -96,3 +96,48 @@ body{
   .button input:hover {
     background: linear-gradient(-135deg, var(--main-blue), var(--main-purple));
   }
+
+    
+.validator {
+  margin-top: 20px;
+  margin-left: 20px;
+  width: 600px;
+  position: relative;
+  height: 140px;
+  overflow: hidden;
+  border-radius: 5px;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+  padding: 7px 20px 0px;
+  background-color: #121726;
+}
+
+.validator p {
+  opacity: 0.5;
+  transition: all 0.3s ease-out;
+}
+
+.validator p span {
+  font-size: 17px;
+  color: #fff;
+  margin-left: 35px;
+  font-weight: 500;
+}
+
+.validator p i {
+  position: absolute;
+  text-align: center;
+  width: 20px;
+  height: 20px;
+  line-height: 26px;
+  font-size: 15px;
+  border-radius: 50%;
+  color: #ffffff;
+}
+
+.fa-check {
+  opacity: 0;
+}
+
+.fa-times {
+  opacity: 1;
+}
