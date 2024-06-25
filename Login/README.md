@@ -11,8 +11,11 @@ Visit : http://localhost/
 SQLite Database – login_details.db with 2 tables, one for storing Login details, and the other for storing User  details.
 # Features :
 Registration Page (login.html) - User will have to register themselves by entering their personal details and by setting up their Login Details i.e. unique Username, strong Password and Security Questions.
+
 Sign-in Page (sigin.html) – User will have to enter their correct Login Details to sign to open their Home Page (home.html).
+
 Reset Password Page (reset.html) – When the user clicks “Forgot Password”, OTP Verification Page (otp.html and verify_otp.html) opens where user enters his registered E-mail ID to get the OTP which is entered by the user for verification. After Verification of OTP, Reset Password Page open where the user resets his new password, which cannot be same as the previous 3 passwords.
+
 Note : For better security, Passwords are stored in encrypted form and passwords expire after 60 days of the setting up of the password.
 
 # Usage :
@@ -45,7 +48,8 @@ Cryptography-fernet : A module that provides symmetric encryption and decryption
 ![Login2](https://github.com/TechNxt05/Amritanshu_Tech/assets/99065174/e6c28024-0b87-480c-941d-ee7f9194e1f8)
 
 # System Architecture :
-![Login3](https://github.com/TechNxt05/Amritanshu_Tech/assets/99065174/87c2e59d-3c03-4e23-8db9-129ff31cb610)
+![Login3 (1)](https://github.com/TechNxt05/Amritanshu_Tech/assets/99065174/0be3aa1f-5481-4d2e-8714-e152cf07f4bd)
+
 
 
 
