@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Extraction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            text-align: center;
+        }
+        input[type="file"], input[type="submit"], #capture-btn {
+            margin: 10px;
+        }
+        .text-box {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+            width: 50%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        #camera {
+            width: 50%;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload or Capture Image to Extract Text</h1>
+    <form id="upload-form" action="/" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image_file" accept="image/*" id="file-input">
+        <input type="submit" value="Submit">
+    </form>
+
+    <h3>Or Capture Image from Webcam:</h3>
+    <button id="capture-btn">Capture Image</button>
+    <video id="camera" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    {% if extracted_text %}
+    <div class="text-box">
+        <h3>Extracted Text:</h3>
+        <p>{{ extracted_text }}</p>
+    </div>
+    {% endif %}
+
+    <script>
+        const captureBtn = document.getElementById('capture-btn');
+        const camera = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
+        const fileInput = document.getElementById('file-input');
+        const uploadForm = document.getElementById('upload-form');
+
+        let stream;
+
+        captureBtn.addEventListener('click', async () => {
+            if (!stream) {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                camera.srcObject = stream;
+                camera.style.display = 'block';
+                captureBtn.textContent = 'Snap Photo';
+            } else {
+                // Capture image from video stream
+                const context = canvas.getContext('2d');
+                canvas.width = camera.videoWidth;
+                canvas.height = camera.videoHeight;
+                context.drawImage(camera, 0, 0, camera.videoWidth, camera.videoHeight);
+
+                // Convert the captured image to a Blob
+                canvas.toBlob((blob) => {
+                    // Create a file from the Blob and update the file input
+                    const file = new File([blob], 'capture.png', { type: 'image/png' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
+
+                    // Submit the form automatically
+                    uploadForm.submit();
+                });
+
+                // Stop the camera stream
+                stream.getTracks().forEach(track => track.stop());
+                camera.style.display = 'none';
+                captureBtn.textContent = 'Capture Image';
+                stream = null;
+            }
+        });
+    </script>
+</body>
+</html>
